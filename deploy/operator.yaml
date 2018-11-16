@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-ttl-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: pod-ttl-operator
+  template:
+    metadata:
+      labels:
+        name: pod-ttl-operator
+    spec:
+      serviceAccountName: pod-ttl-operator
+      containers:
+        - name: pod-ttl-operator
+          # Replace this with the built image name
+          image: docker.io/jnummelin/pod-ttl-operator:latest
+          resources:
+            requests:
+              memory: 20M
+              cpu: 100m
+            limits:
+              memory: 50M
+              cpu: 100m
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              value: ""
+            - name: OPERATOR_NAME
+              value: "pod-ttl-operator"

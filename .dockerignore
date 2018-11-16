@@ -1,0 +1,5 @@
+vendor
+.git*
+deploy
+test-pods
+Dockerfile
