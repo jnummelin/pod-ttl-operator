@@ -30,3 +30,7 @@ spec:
               value: ""
             - name: OPERATOR_NAME
               value: "pod-ttl-operator"
+            # - name: DRY_RUN
+            #   value: "true"
+            # - name: POD_TTL_ANNOTATION
+            #   value: foo.bar/pod-ttl

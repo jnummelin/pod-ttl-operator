@@ -1,0 +1,14 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: ttl-pod
+  labels:
+    name: ttl-pod
+  annotations:
+    foo.bar/pod-ttl: "30"
+spec:
+  containers:
+  - name: ttl-pod
+    image: nginx
+    ports:
+      - containerPort: 80
