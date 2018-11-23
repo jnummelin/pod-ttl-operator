@@ -3,6 +3,7 @@ package pod
 import (
 	"context"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -25,7 +26,11 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcilePod{client: mgr.GetClient(), scheme: mgr.GetScheme(), timers: make(map[string]*time.Timer)}
+	return &ReconcilePod{
+		client: mgr.GetClient(),
+		scheme: mgr.GetScheme(),
+		timers: make(map[string]*time.Timer),
+		dryRun: os.Getenv("DRY_RUN") == "true"}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -59,6 +64,7 @@ type ReconcilePod struct {
 	client client.Client
 	scheme *runtime.Scheme
 	timers map[string]*time.Timer
+	dryRun bool
 }
 
 // Reconcile managed the timers for the Pod TTLs
@@ -124,10 +130,14 @@ func (r *ReconcilePod) Reconcile(request reconcile.Request) (reconcile.Result, e
 	r.timers[request.Namespace+"/"+request.Name] = timer
 	go func() {
 		<-timer.C
-		log.Printf("Timer for Pod %s/%s expired, should go and kill the pod now\n", request.Namespace, request.Name)
-		err := r.client.Delete(context.TODO(), pod)
-		if err != nil {
-			log.Printf("ERROR deleting the pod: %s\n", err)
+		log.Printf("Timer for Pod %s/%s expired", request.Namespace, request.Name)
+		if r.dryRun {
+			log.Printf("DRU RUN: Would've deleted pod %s/%s\n", request.Namespace, request.Name)
+		} else {
+			err := r.client.Delete(context.TODO(), pod)
+			if err != nil {
+				log.Printf("ERROR deleting the pod: %s\n", err)
+			}
 		}
 	}()
 
