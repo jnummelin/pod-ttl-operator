@@ -1,3 +1,5 @@
+[![Build Status](https://cloud.drone.io/api/badges/jnummelin/pod-ttl-operator/status.svg)](https://cloud.drone.io/jnummelin/pod-ttl-operator)
+
 ## Pod TTL Controller
 
 Pod TTL Controller is a controller to manage pod TTLs. TTL == Time-To-Live.
