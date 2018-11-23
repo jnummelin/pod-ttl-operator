@@ -1,0 +1,22 @@
+kind: pipeline
+name: default
+
+workspace:
+  base: /go
+  path: src/github.com/jnummelin/pod-ttl-operator
+
+steps:
+# Enable go build once there's some tests etc.
+# - name: build
+#   image: golang
+#   commands:
+#   - go build cmd/manager/main.go
+- name: docker
+  image: plugins/docker
+  settings:
+    repo: jnummelin/pod-ttl-operator
+    auto_tag: true
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
