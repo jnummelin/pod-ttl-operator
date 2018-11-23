@@ -6,10 +6,11 @@ workspace:
   path: src/github.com/jnummelin/pod-ttl-operator
 
 steps:
-- name: build
-  image: golang
-  commands:
-  - go build cmd/manager/main.go
+# Enable go build once there's some tests etc.
+# - name: build
+#   image: golang
+#   commands:
+#   - go build cmd/manager/main.go
 - name: docker
   image: plugins/docker
   settings:
