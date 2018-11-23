@@ -26,11 +26,16 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+	ttlAnnotation := "nummel.in/pod-ttl"
+	if val := os.Getenv("POD_TTL_ANNOTATION"); val != "" {
+		ttlAnnotation = val
+	}
 	return &ReconcilePod{
-		client: mgr.GetClient(),
-		scheme: mgr.GetScheme(),
-		timers: make(map[string]*time.Timer),
-		dryRun: os.Getenv("DRY_RUN") == "true"}
+		client:     mgr.GetClient(),
+		scheme:     mgr.GetScheme(),
+		timers:     make(map[string]*time.Timer),
+		annotation: ttlAnnotation,
+		dryRun:     os.Getenv("DRY_RUN") == "true"}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -61,10 +66,11 @@ var _ reconcile.Reconciler = &ReconcilePod{}
 type ReconcilePod struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
-	timers map[string]*time.Timer
-	dryRun bool
+	client     client.Client
+	scheme     *runtime.Scheme
+	timers     map[string]*time.Timer
+	dryRun     bool
+	annotation string
 }
 
 // Reconcile managed the timers for the Pod TTLs
@@ -92,7 +98,7 @@ func (r *ReconcilePod) Reconcile(request reconcile.Request) (reconcile.Result, e
 		return reconcile.Result{}, err
 	}
 
-	ttl := pod.Annotations["nummel.in/pod-ttl"]
+	ttl := pod.Annotations[r.annotation]
 	if ttl == "" {
 		log.Printf("Pod does not have TTL annotation, ignoring")
 		return reconcile.Result{}, nil
