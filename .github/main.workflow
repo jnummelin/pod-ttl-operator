@@ -5,7 +5,7 @@ workflow "Basic test" {
 
 action "Lint" {
   uses = "docker://docker.io/golang:1.11.4"
-  runs = "go fmt"
+  runs = "pwd && ls -lah"
 }
 
 action "Test" {
